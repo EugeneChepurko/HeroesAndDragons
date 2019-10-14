@@ -29,12 +29,20 @@ namespace HeroesAndDragons
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<DataContext>();
+            services.AddIdentity<User, IdentityRole>(opts =>
+            {
+                opts.User.RequireUniqueEmail = true;    // уникальный email
+                opts.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"; // допустимые символы
+                opts.Password.RequiredLength = 4;   // минимальная длина
+                opts.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
+                opts.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
+                opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
+                opts.Password.RequireDigit = false; // требуются ли цифры
+            }).AddEntityFrameworkStores<DataContext>();
 
             services.AddMvc();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews();   
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +64,7 @@ namespace HeroesAndDragons
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication(); // new
 
             app.UseEndpoints(endpoints =>
             {

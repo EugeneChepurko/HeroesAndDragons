@@ -1,9 +1,13 @@
 ﻿using HeroesAndDragons.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HeroesAndDragons.Controllers
@@ -12,11 +16,13 @@ namespace HeroesAndDragons.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-
+        private readonly ILogger logger; 
+        
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
+            //signInManager.Options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             _userManager = userManager;
-            _signInManager = signInManager;
+            _signInManager = signInManager;  
         }
         [HttpGet]
         public IActionResult Register()
@@ -28,9 +34,9 @@ namespace HeroesAndDragons.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { UserName = model.Name, Email = model.Email, Date = DateTime.Now };
+                User user = new User { Email = model.Email, UserName = model.Email, Date = DateTime.Now};
                 // добавляем пользователя
-                var result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     // установка куки
@@ -87,7 +93,9 @@ namespace HeroesAndDragons.Controllers
         {
             // удаляем аутентификационные куки
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
+            //return RedirectToAction("Index", "Home");
+            //return RedirectToAction("Login", "Account");
         }
     }
 }
