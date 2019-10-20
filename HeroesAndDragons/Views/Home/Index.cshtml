@@ -1,5 +1,8 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Home Page";
 }
 
-    <p>Hello @User.Identity.Name !</p>
+<p>Hello @User.Identity.Name !</p>
+
+<a asp-action="CreateHero" asp-controller="Home">Create a hero NOW!</a>

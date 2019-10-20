@@ -8,13 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HeroesAndDragons.Models
 {
-    public class DataContext : IdentityDbContext<User>
+    public class DataContext : IdentityDbContext<User> /*DbContext*/
     {
-        //public DbSet<User> UsersBase { get; set; }
+        public DbSet<User> UsersBase { get; set; }
+        public DbSet<Hit> Hits { get; set; }
+        public DbSet<Hero> Heroes { get; set; }
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
+            //Database.Migrate();
         }
     }
 }

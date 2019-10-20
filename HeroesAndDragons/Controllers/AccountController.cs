@@ -16,7 +16,7 @@ namespace HeroesAndDragons.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ILogger logger; 
+        //private readonly ILogger logger; 
         
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
@@ -34,7 +34,7 @@ namespace HeroesAndDragons.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Email = model.Email, UserName = model.Email, Date = DateTime.Now};
+                User user = new User { UserName = model.Email, Email = model.Email, Name = model.Name, Date = DateTime.Now };
                 // добавляем пользователя
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)

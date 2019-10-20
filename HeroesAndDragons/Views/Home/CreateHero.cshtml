@@ -1,0 +1,41 @@
+﻿@*@model HeroesAndDragons.Models.Hero*@
+@*@using HeroesAndDragons.Models;*@
+@*@model HeroesAndDragons.Models.Hero;*@
+@*@model dynamic*@
+@*@model List<Hero>*@
+@*@model dynamic*@
+@*@{
+    ViewData["Title"] = "CreateHero";
+}*@
+
+<h1>CreateHero</h1>
+
+<form asp-action="CreateHero" asp-controller="Home">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label @*asp-for="Name"*@ title="Create a hero!">Create a hero!</label>
+        <input name="Name" @*asp-for="Name"*@ class="form-control" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Weapon</th>
+        <th>Date</th>
+    </tr>
+    @foreach (var item in ViewBag.Heroess)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Name</td>
+            <td>@item.Weapon</td>
+            <td>@item.Date</td>
+        </tr>
+    }
+</table>
+@*<partial name="_CreateHero" />*@
