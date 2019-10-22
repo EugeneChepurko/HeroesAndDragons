@@ -27,22 +27,36 @@ namespace HeroesAndDragons.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CreateHero()
+        public IActionResult CreateHero(int page = 1)
         {
             //dynamic mymodel = new ExpandoObject();
             //mymodel.Heroess = db.Heroes;
-            try
-            {
-                //ViewBag.Heroes = await db.Heroes.ToListAsync();
-                //var messages = db.Heroes;
-                
-                ViewBag.Heroess = await db.Heroes.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                var v = ex.Message;
-            }
-            return View(/*messages.ToList()*//*mymodel*/);           
+
+            int pageSize = 5;   // количество элементов на странице
+
+            //var source = db.Heroes;
+            //var count = await source.CountAsync();
+            //var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            //IEnumerable<Hero> items = db.Heroes.Skip((page - 1) * pageSize).Take(pageSize);
+            //var count = db.Heroes.Count();
+            //PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+            //IndexViewModel viewModel = new IndexViewModel
+            //{
+            //    PageViewModel = pageViewModel,
+            //    Heroes = items
+            //};
+            //ViewBag.Heroess = await db.Heroes.ToListAsync();
+            //return View(viewModel);
+
+            ////
+            IEnumerable<Hero> HeroesPerPages = db.Heroes.Skip((page - 1) * pageSize).Take(pageSize);
+            PageViewModel pageInfo = new PageViewModel(db.Heroes.ToListAsync().Result.Count, page, pageSize);
+            IndexViewModel ivm = new IndexViewModel { PageViewModel = pageInfo, Heroes = HeroesPerPages };
+            return View(ivm);
+            ////
+
+            //return View(/*messages.ToList()*//*mymodel*/viewModel);
         }
 
         [HttpPost]
@@ -59,8 +73,8 @@ namespace HeroesAndDragons.Controllers
             {
                 var v = ex.Message;
             }
-            
-           // return View(hero);
+
+            // return View(hero);
             return Redirect("/Home/CreateHero");
         }
 

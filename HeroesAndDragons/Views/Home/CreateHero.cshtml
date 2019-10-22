@@ -4,9 +4,12 @@
 @*@model dynamic*@
 @*@model List<Hero>*@
 @*@model dynamic*@
+@using HeroesAndDragons.Models;
+@model IndexViewModel
+
 @*@{
-    ViewData["Title"] = "CreateHero";
-}*@
+        ViewData["Title"] = "CreateHero";
+    }*@
 
 <h1>CreateHero</h1>
 
@@ -28,7 +31,7 @@
         <th>Weapon</th>
         <th>Date</th>
     </tr>
-    @foreach (var item in ViewBag.Heroess)
+    @foreach (var item in Model.Heroes)
     {
         <tr>
             <td>@item.Id</td>
@@ -38,4 +41,23 @@
         </tr>
     }
 </table>
+
+@if (Model.PageViewModel.HasPreviousPage)
+{
+    <a asp-action="CreateHero"
+       asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+       class="btn btn-info btn">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Назад
+    </a>
+}
+@if (Model.PageViewModel.HasNextPage)
+{
+    <a asp-action="CreateHero"
+       asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+       class="btn btn-info btn">
+        Вперед
+        <i class="glyphicon glyphicon-chevron-right"></i>
+    </a>
+}
 @*<partial name="_CreateHero" />*@
