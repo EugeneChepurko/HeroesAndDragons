@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using HeroesAndDragons.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Dynamic;
 
 namespace HeroesAndDragons.Controllers
 {
@@ -27,13 +25,16 @@ namespace HeroesAndDragons.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateHero(int page = 1)
+        public  async Task<IActionResult> CreateHero(int? page, SortState sortOrder = SortState.NameAsc)
         {
             //dynamic mymodel = new ExpandoObject();
             //mymodel.Heroess = db.Heroes;
 
             int pageSize = 5;   // количество элементов на странице
-
+            //ViewData["NameSortParm"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
+            ViewData["NameSortParm"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
+            ViewData["CurrentSort"] = sortOrder;
+            
             //var source = db.Heroes;
             //var count = await source.CountAsync();
             //var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
@@ -48,14 +49,25 @@ namespace HeroesAndDragons.Controllers
             //};
             //ViewBag.Heroess = await db.Heroes.ToListAsync();
             //return View(viewModel);
+            var heroes = from hero in db.Heroes
+                         select hero;
 
+            switch (sortOrder)
+            {
+                case SortState.NameDesc:
+                    heroes = heroes.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    heroes = heroes.OrderBy(s => s.Name);
+                    break;
+            }
             ////
-            IEnumerable<Hero> HeroesPerPages = db.Heroes.Skip((page - 1) * pageSize).Take(pageSize);
-            PageViewModel pageInfo = new PageViewModel(db.Heroes.ToListAsync().Result.Count, page, pageSize);
-            IndexViewModel ivm = new IndexViewModel { PageViewModel = pageInfo, Heroes = HeroesPerPages };
-            return View(ivm);
+            //IEnumerable<Hero> HeroesPerPages = db.Heroes.Skip((page - 1) * pageSize).Take(pageSize);
+            //PageViewModel pageInfo = new PageViewModel(db.Heroes.ToListAsync().Result.Count, page, pageSize);
+            //IndexViewModel ivm = new IndexViewModel { PageViewModel = pageInfo, Heroes = HeroesPerPages };
+            //return View(ivm);
             ////
-
+            return View(await PaginatedList<Hero>.CreateAsync(heroes.AsNoTracking(), page ?? 1, pageSize));
             //return View(/*messages.ToList()*//*mymodel*/viewModel);
         }
 

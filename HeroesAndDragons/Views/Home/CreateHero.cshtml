@@ -4,9 +4,10 @@
 @*@model dynamic*@
 @*@model List<Hero>*@
 @*@model dynamic*@
-@using HeroesAndDragons.Models;
-@model IndexViewModel
 
+@*@using HeroesAndDragons.Models;
+    @model IndexViewModel*@
+@model PaginatedList<HeroesAndDragons.Models.Hero>
 @*@{
         ViewData["Title"] = "CreateHero";
     }*@
@@ -27,37 +28,65 @@
 <table class="table">
     <tr>
         <th>Id</th>
-        <th>Name</th>
+        <th><a asp-action="CreateHero" asp-route-sortOrder="@ViewData["NameSortParm"]">Name</a></th>
+        @*<th>@Html.ActionLink("Name", "CreateHero", new { sortOrder = ViewBag.NameSortParam })</th>*@
         <th>Weapon</th>
         <th>Date</th>
     </tr>
-    @foreach (var item in Model.Heroes)
-    {
-        <tr>
-            <td>@item.Id</td>
-            <td>@item.Name</td>
-            <td>@item.Weapon</td>
-            <td>@item.Date</td>
-        </tr>
-    }
+    @foreach (var item in Model@*.Heroes*@)
+{
+<tr>
+    <td>@item.Id</td>
+    <td>@item.Name</td>
+    <td>@item.Weapon</td>
+    <td>@item.Date</td>
+</tr>
+}
 </table>
 
-@if (Model.PageViewModel.HasPreviousPage)
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+@if (Model.HasPreviousPage)
 {
     <a asp-action="CreateHero"
-       asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+       asp-route-page="@(Model.PageIndex - 1)"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
        class="btn btn-info btn">
         <i class="glyphicon glyphicon-chevron-left"></i>
         Назад
     </a>
 }
-@if (Model.PageViewModel.HasNextPage)
+@if (Model.HasNextPage)
 {
     <a asp-action="CreateHero"
-       asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+       asp-route-page="@(Model.PageIndex + 1)"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
        class="btn btn-info btn">
         Вперед
         <i class="glyphicon glyphicon-chevron-right"></i>
     </a>
 }
+
+@*@if (Model.PageViewModel.HasPreviousPage)
+    {
+        <a asp-action="CreateHero"
+           asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+           asp-route-sortOrder="@(Model.SortViewModel.Current)"
+           class="btn btn-info btn">
+            <i class="glyphicon glyphicon-chevron-left"></i>
+            Назад
+        </a>
+    }
+    @if (Model.PageViewModel.HasNextPage)
+    {
+        <a asp-action="CreateHero"
+           asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+           asp-route-sortOrder="@(Model.SortViewModel.Current)"
+           class="btn btn-info btn">
+            Вперед
+            <i class="glyphicon glyphicon-chevron-right"></i>
+        </a>
+    }*@
 @*<partial name="_CreateHero" />*@

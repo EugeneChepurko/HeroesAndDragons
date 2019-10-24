@@ -9,5 +9,6 @@ namespace HeroesAndDragons.Models
     {
         public IEnumerable<Hero> Heroes { get; set; }
         public PageViewModel PageViewModel { get; set; }
+        public SortViewModel SortViewModel { get; set; }
     }
 }
