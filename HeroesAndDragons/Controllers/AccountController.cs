@@ -34,7 +34,7 @@ namespace HeroesAndDragons.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { UserName = model.Email, Email = model.Email, Name = model.Name, Date = DateTime.Now };
+                User user = new User { UserName = model.Name, Email = model.Email, Name = model.Name, Date = DateTime.Now };
                 // добавляем пользователя
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)

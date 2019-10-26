@@ -35,6 +35,14 @@ namespace HeroesAndDragons.Models
                     Description = $"Имя не может содержать - 'admin'"
                 });
             }
+
+            if(user.Email.Contains("admin"))
+            {
+                errors.Add(new IdentityError
+                {
+                    Description = $"Email не может содержать - 'admin'"
+                });
+            }
             return Task.FromResult(errors.Count == 0 ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray()));
         }
     }

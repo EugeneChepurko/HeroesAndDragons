@@ -30,7 +30,7 @@ namespace HeroesAndDragons
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IUserValidator<User>, UserNameValidator>();
-            //services.AddTransient<IUserValidator<Hero>, HeroNameValidator>();
+            services.AddTransient<IUserValidator<Hero>, HeroNameValidator>();
 
 
             services.AddIdentity<User, IdentityRole>(opts =>
@@ -42,7 +42,8 @@ namespace HeroesAndDragons
                 opts.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
                 opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
                 opts.Password.RequireDigit = false; // требуются ли цифры
-            }).AddEntityFrameworkStores<DataContext>();
+
+            }).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 
             services.AddMvc();
 

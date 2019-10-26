@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using HeroesAndDragons.Models;
@@ -25,30 +26,12 @@ namespace HeroesAndDragons.Controllers
         }
 
         [HttpGet]
-        public  async Task<IActionResult> CreateHero(int? page, SortState sortOrder = SortState.NameAsc)
+        public async Task<IActionResult> HeroList(int? page, SortState sortOrder = SortState.NameAsc)
         {
-            //dynamic mymodel = new ExpandoObject();
-            //mymodel.Heroess = db.Heroes;
-
-            int pageSize = 5;   // количество элементов на странице
-            //ViewData["NameSortParm"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
+            int pageSize = 10;   // количество элементов на странице
             ViewData["NameSortParm"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
             ViewData["CurrentSort"] = sortOrder;
-            
-            //var source = db.Heroes;
-            //var count = await source.CountAsync();
-            //var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            //IEnumerable<Hero> items = db.Heroes.Skip((page - 1) * pageSize).Take(pageSize);
-            //var count = db.Heroes.Count();
-            //PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
-            //IndexViewModel viewModel = new IndexViewModel
-            //{
-            //    PageViewModel = pageViewModel,
-            //    Heroes = items
-            //};
-            //ViewBag.Heroess = await db.Heroes.ToListAsync();
-            //return View(viewModel);
             var heroes = from hero in db.Heroes
                          select hero;
 
@@ -61,14 +44,13 @@ namespace HeroesAndDragons.Controllers
                     heroes = heroes.OrderBy(s => s.Name);
                     break;
             }
-            ////
-            //IEnumerable<Hero> HeroesPerPages = db.Heroes.Skip((page - 1) * pageSize).Take(pageSize);
-            //PageViewModel pageInfo = new PageViewModel(db.Heroes.ToListAsync().Result.Count, page, pageSize);
-            //IndexViewModel ivm = new IndexViewModel { PageViewModel = pageInfo, Heroes = HeroesPerPages };
-            //return View(ivm);
-            ////
             return View(await PaginatedList<Hero>.CreateAsync(heroes.AsNoTracking(), page ?? 1, pageSize));
-            //return View(/*messages.ToList()*//*mymodel*/viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult CreateHero()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -76,18 +58,28 @@ namespace HeroesAndDragons.Controllers
         {
             try
             {
+                var foundHero = db.Heroes.FirstOrDefault(n => n.Name == hero.Name);
                 Guid g = Guid.NewGuid();
                 hero.Id = g.ToString();
-                db.Heroes.Add(hero);
-                await db.SaveChangesAsync();
+                if (foundHero.Name == hero.Name)
+                {
+                    ModelState.AddModelError("Name", "Герой с таким именем уже существует!");
+                }
+
+                if(ModelState.IsValid)
+                {
+                    db.Heroes.Add(hero);
+                    await db.SaveChangesAsync();
+                    return Redirect("/Home/HeroList");
+                }   
             }
             catch (Exception ex)
             {
                 var v = ex.Message;
             }
 
-            // return View(hero);
-            return Redirect("/Home/CreateHero");
+            return View(hero);
+            //return Redirect("/Home/CreateHero");
         }
 
         public IActionResult Index()

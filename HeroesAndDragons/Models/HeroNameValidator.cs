@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,5 +39,13 @@ namespace HeroesAndDragons.Models
 
             return Task.FromResult(errors.Count == 0 ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray()));
         }
+        //public override bool IsValid(object value)
+        //{
+        //    var v = db.Heroes.FirstOrDefault(n => n.Name == value.ToString());
+        //    if (v.Name == value.ToString())
+        //        return true;
+
+        //    return false;
+        //}
     }
 }
