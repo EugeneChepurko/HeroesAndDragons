@@ -58,15 +58,28 @@ namespace HeroesAndDragons.Controllers
         {
             try
             {
-                var foundHero = db.Heroes.FirstOrDefault(n => n.Name == hero.Name);
+                var foundHero = db.Heroes?.FirstOrDefault(n => n.Name == hero.Name);
                 Guid g = Guid.NewGuid();
                 hero.Id = g.ToString();
-                if (foundHero.Name == hero.Name)
+                if(foundHero != null)
                 {
-                    ModelState.AddModelError("Name", "Герой с таким именем уже существует!");
+                    if (foundHero.Name == hero.Name)
+                    {
+                        ModelState.AddModelError("Name", "Герой с таким именем уже существует!");
+                    }
+                }               
+
+                if (hero.Name.StartsWith(" ") || hero.Name.EndsWith(" "))
+                {
+                    ModelState.AddModelError("Name", "Имя не может начинаться или заканчиваться пробелом.");                
                 }
 
-                if(ModelState.IsValid)
+                if(hero.Name.Contains("admin"))
+                {
+                    ModelState.AddModelError("Name", $"Имя не может содержать - 'admin'");
+                }
+
+                if (ModelState.IsValid)
                 {
                     db.Heroes.Add(hero);
                     await db.SaveChangesAsync();

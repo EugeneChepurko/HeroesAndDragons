@@ -30,7 +30,7 @@ namespace HeroesAndDragons
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IUserValidator<User>, UserNameValidator>();
-            services.AddTransient<IUserValidator<Hero>, HeroNameValidator>();
+            //services.AddTransient<IUserValidator<Hero>, HeroNameValidator>();
 
 
             services.AddIdentity<User, IdentityRole>(opts =>
