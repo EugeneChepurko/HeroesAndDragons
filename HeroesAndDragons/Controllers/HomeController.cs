@@ -26,14 +26,20 @@ namespace HeroesAndDragons.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> HeroList(int? page, SortState sortOrder = SortState.NameAsc)
+        public async Task<IActionResult> HeroList(string searchbyFilter, int? page, SortState sortOrder = SortState.NameAsc)
         {
             int pageSize = 10;   // количество элементов на странице
             ViewData["NameSortParm"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
             ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentFilterByName"] = searchbyFilter;
 
             var heroes = from hero in db.Heroes
                          select hero;
+
+            if(searchbyFilter != null)
+            {
+                heroes = heroes.Where(n => n.Name.Contains(searchbyFilter));
+            }
 
             switch (sortOrder)
             {
@@ -61,30 +67,45 @@ namespace HeroesAndDragons.Controllers
                 var foundHero = db.Heroes?.FirstOrDefault(n => n.Name == hero.Name);
                 Guid g = Guid.NewGuid();
                 hero.Id = g.ToString();
-                if(foundHero != null)
+                if (foundHero?.Name == hero.Name)
                 {
-                    if (foundHero.Name == hero.Name)
-                    {
-                        ModelState.AddModelError("Name", "Герой с таким именем уже существует!");
-                    }
-                }               
-
-                if (hero.Name.StartsWith(" ") || hero.Name.EndsWith(" "))
-                {
-                    ModelState.AddModelError("Name", "Имя не может начинаться или заканчиваться пробелом.");                
+                    ModelState.AddModelError("Name", "Герой с таким именем уже существует!");
                 }
-
-                if(hero.Name.Contains("admin"))
+                else if (hero.Name.StartsWith(" ") || hero.Name.EndsWith(" "))
+                {
+                    ModelState.AddModelError("Name", "Имя не может начинаться или заканчиваться пробелом.");
+                }
+                else if (hero.Name.Contains("admin"))
                 {
                     ModelState.AddModelError("Name", $"Имя не может содержать - 'admin'");
                 }
-
-                if (ModelState.IsValid)
+                else
                 {
-                    db.Heroes.Add(hero);
-                    await db.SaveChangesAsync();
-                    return Redirect("/Home/HeroList");
-                }   
+                    if (ModelState.IsValid)
+                    {
+                        db.Heroes.Add(hero);
+                        await db.SaveChangesAsync();
+                        return Redirect("/Home/HeroList");
+                    }
+                }
+
+
+                //if (hero.Name.StartsWith(" ") || hero.Name.EndsWith(" "))
+                //{
+                //    ModelState.AddModelError("Name", "Имя не может начинаться или заканчиваться пробелом.");                
+                //}
+
+                //if(hero.Name.Contains("admin"))
+                //{
+                //    ModelState.AddModelError("Name", $"Имя не может содержать - 'admin'");
+                //}
+
+                //if (ModelState.IsValid)
+                //{
+                //    db.Heroes.Add(hero);
+                //    await db.SaveChangesAsync();
+                //    return Redirect("/Home/HeroList");
+                //}   
             }
             catch (Exception ex)
             {

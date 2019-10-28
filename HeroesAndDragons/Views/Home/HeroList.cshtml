@@ -18,7 +18,12 @@
     </div>
 </form>
 -->
-
+<form asp-action="HeroList" class="form-inline" method="get">
+    <p>
+        Find by Hero name: <input type="text" name="searchbyFilter" class="form-control" placeholder="Name?" value="@ViewData["CurrentFilterByName"]" />
+        <input type="submit" value="Search" class="btn btn-info" />
+    </p>
+</form>
 <table class="table">
     <tr>
         <th>Id</th>
