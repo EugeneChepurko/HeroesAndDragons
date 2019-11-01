@@ -8,9 +8,9 @@ namespace HeroesAndDragons.Models
         [Key]
         public string Id { get; set; }
 
-        [Required(ErrorMessage = "Имя не указано.")]
+        //[Required(ErrorMessage = "Имя не указано.")]
         [StringLength(20, MinimumLength = 4, ErrorMessage = "Длина имени должна быть от 4 до 20 символов.")]
-        [Display(Name = "Name")]
+        //[Display(Name = "Name")]
         public string Name { get; set; }
 
         public int HitPoint { get; set; }
@@ -19,6 +19,7 @@ namespace HeroesAndDragons.Models
         public Dragon()
         {
             HitPoint = new Random().Next(80, 100);
+            Date = DateTime.Now;
         }
     }
 }

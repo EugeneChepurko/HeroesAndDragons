@@ -24,9 +24,9 @@ namespace HeroesAndDragons.Models
         public DateTime Date { get; set; }
 
         public Hero()
-        {
-            Date = DateTime.Now;
+        {          
             Weapon = random.Next(1, 6);
+            Date = DateTime.Now;
         }
 
         //public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

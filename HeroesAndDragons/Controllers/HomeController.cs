@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using HeroesAndDragons.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace HeroesAndDragons.Controllers
             var heroes = from hero in db.Heroes
                          select hero;
 
-            if(searchbyFilter != null)
+            if (searchbyFilter != null)
             {
                 heroes = heroes.Where(n => n.Name.Contains(searchbyFilter));
             }
@@ -88,24 +89,6 @@ namespace HeroesAndDragons.Controllers
                         return Redirect("/Home/HeroList");
                     }
                 }
-
-
-                //if (hero.Name.StartsWith(" ") || hero.Name.EndsWith(" "))
-                //{
-                //    ModelState.AddModelError("Name", "Имя не может начинаться или заканчиваться пробелом.");                
-                //}
-
-                //if(hero.Name.Contains("admin"))
-                //{
-                //    ModelState.AddModelError("Name", $"Имя не может содержать - 'admin'");
-                //}
-
-                //if (ModelState.IsValid)
-                //{
-                //    db.Heroes.Add(hero);
-                //    await db.SaveChangesAsync();
-                //    return Redirect("/Home/HeroList");
-                //}   
             }
             catch (Exception ex)
             {
@@ -116,6 +99,35 @@ namespace HeroesAndDragons.Controllers
             //return Redirect("/Home/CreateHero");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateDragon(Dragon dragon)
+        {
+            string name = RandomNameForDragon();
+            dragon.Name = name;
+            Guid g = Guid.NewGuid();
+            dragon.Id = g.ToString();
+
+            if(ModelState.IsValid)
+            {
+                db.Dragons.Add(dragon);
+                await db.SaveChangesAsync();
+                return Redirect("/Home/DragonWasCreated");
+            }
+            
+            return View(dragon);
+        }
+
+        [HttpGet]
+        public IActionResult DragonWasCreated()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult CreateDragon()
+        {
+            return View();
+        }
         public IActionResult Index()
         {
             return View();
@@ -130,6 +142,19 @@ namespace HeroesAndDragons.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private string RandomNameForDragon()
+        {
+            Random random = new Random();
+            int lengthName = random.Next(4, 20);
+            StringBuilder builder = new StringBuilder();
+            char[] symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890".ToCharArray();
+            while (0 <= lengthName--)
+            {
+                builder.Append(symbols[random.Next(symbols.Length)]);
+            }
+            return builder.ToString();
         }
     }
 }
