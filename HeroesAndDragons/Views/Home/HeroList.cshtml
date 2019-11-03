@@ -1,9 +1,9 @@
 ﻿@model PaginatedList<HeroesAndDragons.Models.Hero>
 @{
-    ViewData["Title"] = "CreateHero";
+    ViewData["Title"] = "List of Hero";
 }
 
-<h1>HeroList</h1>
+<h3>HeroList</h3>
 
 <!--
 <form asp-action="CreateHero" asp-controller="Home">
@@ -20,7 +20,7 @@
 -->
 <form asp-action="HeroList" class="form-inline" method="get">
     <p>
-        Find by Hero name: <input type="text" name="searchbyFilter" class="form-control" placeholder="Name?" value="@ViewData["CurrentFilterByName"]" />
+        Find Hero by name: <input type="text" name="searchbyFilter" class="form-control" placeholder="Name?" value="@ViewData["CurrentFilterByName"]" />
         <input type="submit" value="Search" class="btn btn-info" />
     </p>
 </form>

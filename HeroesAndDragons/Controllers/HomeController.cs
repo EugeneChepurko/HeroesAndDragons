@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using HeroesAndDragons.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -102,19 +103,47 @@ namespace HeroesAndDragons.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDragon(Dragon dragon)
         {
-            string name = RandomNameForDragon();
-            dragon.Name = name;
+            List<Dragon> dragonsHisNameIsEquals = new List<Dragon>();
             Guid g = Guid.NewGuid();
             dragon.Id = g.ToString();
-
-            if(ModelState.IsValid)
+            dragon.Name = RandomNameForDragon();
+            int counter = 0;
+            foreach (var item in db.Dragons)
+            {
+                if (counter < 1000/* && counter > 1000) || (counter < 3000 && counter > 2000)*/)
+                {
+                    if (item.Name == dragon.Name)
+                    {
+                        dragonsHisNameIsEquals.Add(item);
+                        if (dragonsHisNameIsEquals.Count() > 2)
+                        {
+                            dragon.Name = RandomNameForDragon();
+                            counter++;
+                        }
+                        else
+                        {
+                            counter++;
+                        }
+                    }
+                    else
+                    {
+                        counter++;
+                    }
+                }
+            }
+            if (ModelState.IsValid)
             {
                 db.Dragons.Add(dragon);
                 await db.SaveChangesAsync();
                 return Redirect("/Home/DragonWasCreated");
             }
-            
             return View(dragon);
+        }
+
+        [HttpGet]
+        public IActionResult CreateDragon()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -124,10 +153,36 @@ namespace HeroesAndDragons.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateDragon()
+        public async Task<IActionResult> ListOfDragons(string searchbyFilter, int? page, SortState sortOrder = SortState.NameAsc)
         {
-            return View();
+            int pageSize = 10;   // количество элементов на странице
+            ViewData["NameSortParm"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentFilterByName"] = searchbyFilter;
+
+            var dragons1 = from dragon in db.Dragons
+                         select dragon;
+
+            if (searchbyFilter != null)
+            {
+                dragons1 = dragons1.Where(n => n.Name.Contains(searchbyFilter));
+            }
+
+            switch (sortOrder)
+            {
+                case SortState.NameDesc:
+                    dragons1 = dragons1.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    dragons1 = dragons1.OrderBy(s => s.Name);
+                    break;
+            }
+            return View(await PaginatedList<Dragon>.CreateAsync(dragons1.AsNoTracking(), page ?? 1, pageSize));
+
+            //var dragons = db.Dragons.ToListAsync();
+            //return View(dragons.Result.ToList());
         }
+
         public IActionResult Index()
         {
             return View();
@@ -152,6 +207,8 @@ namespace HeroesAndDragons.Controllers
             char[] symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890".ToCharArray();
             while (0 <= lengthName--)
             {
+                //char c = symbols[random.Next(symbols.Length)];
+                //c = Char.ToUpper(c);
                 builder.Append(symbols[random.Next(symbols.Length)]);
             }
             return builder.ToString();
